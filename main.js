@@ -16,6 +16,10 @@ require('dotenv').config();
 const logger = require('morgan');
 app.use(logger('dev'));
 
+function middleWares() {
+  app.use(express.urlencoded({ extended: false }));
+  app.use(express.static('./static'));
+}
 //
 
 // Grants access to get and body variabels
@@ -36,37 +40,21 @@ connect();
 
 //
 
+//
+
 /* Application initiation process 
 ----- */
 
 const PORT = process.env.PORT || 5500;
-app.listen(PORT, console.log(`-- Server is running on PORT: ${PORT} --`));
 
 //
 
 /* This is basicly an API, it returns pure data for our enjoyment
 ----- */
-//api - gives pure data
-//skickar lista på all data
-app.get('/cars', (req, res) => {
-  res.send('Hellow World!');
-});
 
-//skickar data om ett object
+require('./tempAPI-example.js')(app);
 
-app.get('/cars/:id', (req, res) => {
-  res.send('Single Wordls');
-});
-
-//skapar nytt ovjekt
-app.post('/cars', (req, res) => {
-  res.send('crt');
-});
-
-//SSR Server side REndering
-app.get('/about', (req, res) => {
-  res.sendFile(__dirname + 'index.html');
-});
+//
 
 //
 
@@ -78,9 +66,13 @@ async function connect() {
   const db = client.db('CoffeeBooks');
   const bookList = db.collection('BookList');
 
-  require(dir + 'routes.js')(bookList);
+  middleWares();
 
-  client.close();
+  app.listen(PORT, console.log(`-- Server is running on PORT: ${PORT} --`));
+
+  require(dir + 'routes.js')(bookList, express, app);
+
+  //!  client.close();
 }
 
 //
