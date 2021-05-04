@@ -129,13 +129,14 @@ TODO: Develop everything backend, afterward develop frontend
 • Node Startup: https://replit.com/@RichardTE18IT/nodetuesday21-02-10#index.js 
 
  */
+
 /*
 git config --global user.name "AUserName" // username set 
 git config --global user.name "E@mail.com" //email set 
 
 git --version //checks version
-init git // creatre master bash with ./.git
-git add . // adds files to 'git-plan-to-comit-changes'
+init git // creatre master bash with ./.git, done once
+git add . // adds all files to 'git-plan-to-comit-changes'
 git add "index.js" // adds only index.js to git
 git commit -m"Change Notes" //commits the git
 
@@ -149,4 +150,8 @@ git remote add origin https://github.com/CuteFoxPaw/testerVisual.git
 
 git remote // gets origin
 
+git push origin master // uploads code, master root-doc = brach, origin = github address
+
+get clone origin master// get project, used firts time
+git pull origin master// gets changes
 */
