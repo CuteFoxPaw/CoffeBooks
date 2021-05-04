@@ -136,5 +136,17 @@ git config --global user.name "E@mail.com" //email set
 git --version //checks version
 init git // creatre master bash with ./.git
 git add . // adds files to 'git-plan-to-comit-changes'
-git commit -m"Change Notes" //commits and uploads to git
+git add "index.js" // adds only index.js to git
+git commit -m"Change Notes" //commits the git
+
+git status // checks satus of files
+
+// if you have a secure file, like password. create a '.gitignore' file in which you'll just add the name of document, more files-ignore is seperated by new lines. You can also add a whole dir of the mat. '.gitignore' must be in root
+
+//--- upload to github --
+
+git remote add origin https://github.com/CuteFoxPaw/testerVisual.git
+
+git remote // gets origin
+
 */
