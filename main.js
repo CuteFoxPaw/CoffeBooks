@@ -129,3 +129,12 @@ TODO: Develop everything backend, afterward develop frontend
 • Node Startup: https://replit.com/@RichardTE18IT/nodetuesday21-02-10#index.js 
 
  */
+/*
+git config --global user.name "AUserName" // username set 
+git config --global user.name "E@mail.com" //email set 
+
+git --version //checks version
+init git // creatre master bash with ./.git
+git add . // adds files to 'git-plan-to-comit-changes'
+git commit -m"Change Notes" //commits and uploads to git
+*/
