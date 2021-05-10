@@ -106,6 +106,8 @@ TODO: Develop everything backend, afterward develop frontend
 400 - Bad Request; The server cannot or will not process the request due to an apparent client error 
 304 - all ok, not modified
 201 - all ok
+
+https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#4xx_client_errors
 */
 
 /* Resources
@@ -147,6 +149,6 @@ git remote // gets origin
 
 git push origin master // uploads code, master root-doc = brach, origin = github address
 
-get clone origin master// get project, used firts time
+git clone origin master// get project, used firts time
 git pull origin master// gets changes
 */
