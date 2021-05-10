@@ -103,6 +103,7 @@ TODO: Develop everything backend, afterward develop frontend
 ? status codes:
 500 - server problem
 404 - client problem
+400 - Bad Request; The server cannot or will not process the request due to an apparent client error 
 304 - all ok, not modified
 201 - all ok
 */

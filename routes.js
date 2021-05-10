@@ -29,8 +29,11 @@ module.exports = (bookList, express, app) => {
     }
   });
 
-  app.get('books/:id', async (req, res) => {
+  app.get('/books/:id', async (req, res) => {
     try {
+      console.log('THIS IS BOOKS');
+      console.log(req.params.id);
+
       res
         .status(201)
         .send(await bookList.findOne({ _id: ObjectId(req.params.id) }));
@@ -42,5 +45,3 @@ module.exports = (bookList, express, app) => {
     res.status(404).send(`Page Not Found`);
   });
 };
-
-// added comment from GitHub
