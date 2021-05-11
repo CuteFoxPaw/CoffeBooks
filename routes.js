@@ -19,11 +19,13 @@ module.exports = (bookList, express, app) => {
     res.sendFile(dir + 'html.html');
   });
 
+
+  //! Change API routes to api prefixes ie. '/api/books' 'api/books/:id'
   // retuns all avalible books
   app.get('/books', async (req, res) => {
     try {
       res.status(201).send(await bookList.find().toArray());
-      // ! ERROR CODE: Topology is closed, please connect
+      // // ! ERROR CODE: Topology is closed, please connect
     } catch (error) {
       res.send(error.message);
     }
