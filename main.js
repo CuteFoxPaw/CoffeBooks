@@ -126,10 +126,10 @@ https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#4xx_client_errors
 • Node Startup: https://replit.com/@RichardTE18IT/nodetuesday21-02-10#index.js 
 
  */
-
+// Sync vs extension https://itnext.io/settings-sync-with-vs-code-c3d4f126989 
 /*
 git config --global user.name "AUserName" // username set 
-git config --global user.name "E@mail.com" //email set 
+ git config --global user.name "E@mail.com" //email set 
 
 git --version //checks version
 init git // creatre master bash with ./.git, done once
@@ -151,4 +151,8 @@ git push origin master // uploads code, master root-doc = brach, origin = github
 
 git clone origin master// get project, used firts time
 git pull origin master// gets changes
+
+
+// reset local branch
+  https://stackoverflow.com/questions/1125968/how-do-i-force-git-pull-to-overwrite-local-files 
 */
