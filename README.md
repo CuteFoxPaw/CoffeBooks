@@ -1,5 +1,8 @@
-# CoffeBooks
+# CoffeBooks - Node.js Booklist
+## Info
+This is my webbserverdevelopment course endproject
+## Node.js & Express
+This is a booklist made with Node.js and express.\
+This is also similar to the [PHP-Booklist](https://github.com/VulpesPaw/PHP-BookList Link to PHP-BookList, Booklist made with nativ PHP") as well as the [Firebase Booklist](https://github.com/VulpesPaw/FireBookList "Link to FireBookList, Booklist made with Firebase and Firestore")\
 
-This is a git for thee fabolous CoffeeBooks book list\
-This is a webbserver development thingify\
-This will become a working webbserver, and it will be applied for learning experience
+##
