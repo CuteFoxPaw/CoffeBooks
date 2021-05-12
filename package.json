@@ -5,7 +5,11 @@
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon main.js"
+    "start": "npx concurrently -n browser,node npm:open-browser npm:watch-node --kill-others-on-fail",
+    "open-browser": "bash ./openbrowser.sh",
+    "watch-scss": "npx sass --watch src/scss:public/css",
+    "watch-node2": "npx nodemon main.js",
+    "watch-node": "node main.js"
   },
   "author": "RicJoh",
   "license": "UNLICENSED",

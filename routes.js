@@ -14,6 +14,9 @@ module.exports = (bookList, express, app) => {
   TODO: FIX JWT
  */
 
+app.use(cors());
+const auth = require('auth');
+
   // returns homepage
   app.get('/', (req, res) => {
     res.sendFile(dir + 'html.html');
