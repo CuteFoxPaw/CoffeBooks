@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx concurrently -n browser,node npm:open-browser npm:watch-node --kill-others-on-fail",
+    "go": "nodemon main.js",
     "open-browser": "bash ./openbrowser.bat",
     "watch-scss": "npx sass --watch src/scss:public/css",
     "watch-node2": "npx nodemon main.js",
@@ -14,6 +15,7 @@
   "author": "RicJoh",
   "license": "UNLICENSED",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "concurrently": "^6.1.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
@@ -21,6 +23,7 @@
     "env": "0.0.2",
     "express": "^4.17.1",
     "handlebars": "^4.7.7",
+    "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.6.6",
     "morgan": "^1.10.0",
     "node": "^15.14.0",
