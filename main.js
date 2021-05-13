@@ -67,12 +67,13 @@ async function connect() {
   const connection = await client.connect();
   const db = client.db('CoffeeBooks');
   const bookList = db.collection('BookList');
+  const userList = db.collection('users');
 
   middleWares();
 
   app.listen(PORT, console.log(`-- Server is running on PORT: ${PORT} --`));
 
-  require(dir + 'routes.js')(bookList, express, app);
+  require(dir + 'routes.js')(bookList, userList, express, app);
 
   //!  client.close();
 }
@@ -126,7 +127,7 @@ https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#4xx_client_errors
 • Node Startup: https://replit.com/@RichardTE18IT/nodetuesday21-02-10#index.js 
 
  */
-// Sync vs extension https://itnext.io/settings-sync-with-vs-code-c3d4f126989 
+// Sync vs extension https://itnext.io/settings-sync-with-vs-code-c3d4f126989
 /*
 git config --global user.name "AUserName" // username set 
  git config --global user.name "E@mail.com" //email set 
