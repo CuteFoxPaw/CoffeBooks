@@ -18,10 +18,10 @@ require('dotenv').config();
 const logger = require('morgan');
 app.use(logger('dev'));
 
-function middleWares() {
+//function middleWares() {
   app.use(express.urlencoded({ extended: false }));
   app.use(express.static('./static'));
-}
+//}
 //
 
 // Grants access to get and body variabels
@@ -69,7 +69,7 @@ async function connect() {
   const bookList = db.collection('BookList');
   const userList = db.collection('users');
 
-  middleWares();
+ // middleWares();
 
   app.listen(PORT, console.log(`-- Server is running on PORT: ${PORT} --`));
 
