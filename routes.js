@@ -31,6 +31,7 @@ module.exports = (bookList, userList, express, app) => {
   app.get("/users", auth, async (req, res) => {
     //res.send(await /*DB FOR USERS*/);
   });
+  // https://befonts.com/alegra-sans-serif-font.html
 
   async function register(req, res) {
     let user = {
