@@ -34,6 +34,7 @@ app.use(express.json());
 ----- */
 
 const uri = process.env.URI;
+console.log(`-- TBL LOG --: process`, process);
 console.log(`-- TBL LOG :: process`, process);
 console.log("Super duper thingyfi: process", process);
 console.log("uri", uri);
