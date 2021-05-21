@@ -32,7 +32,7 @@ module.exports = (bookList, userList, express, app) => {
   app.get('/users', auth, async (req, res) => {
     //res.send(await /*DB FOR USERS*/);
   });
-  //befonts.com/alegra-sans-serif-font.html
+  
 
   async function register(req, res) {
     let user = {
@@ -138,3 +138,12 @@ module.exports = (bookList, userList, express, app) => {
     res.status(404).send(`Page Not Found`);
   });
 };
+
+/* Font links
+----- */
+
+//https://befonts.com/alegra-sans-serif-font.html
+
+let check;
+//
+
