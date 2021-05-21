@@ -1,12 +1,12 @@
 /* Main inports / require
 ----- */
-const express = require("express");
+const express = require('express');
 const app = express();
-const dir = __dirname + "/";
-const MongoClient = require("mongodb").MongoClient;
+const dir = __dirname + '/';
+const MongoClient = require('mongodb').MongoClient;
 
 // Allows the use of enviorment variables
-require("dotenv").config();
+require('dotenv').config();
 
 //This  is a comment by david!!!
 
@@ -15,18 +15,18 @@ require("dotenv").config();
 /* Middlewares
 ----- */
 
-const logger = require("morgan");
-app.use(logger("dev"));
+const logger = require('morgan');
+//app.use(logger('dev'));
 
-//function middleWares() {
-app.use(express.urlencoded({ extended: false }));
-app.use(express.static("./static"));
-//}
-//
+//function middleWares()
 
 // Grants access to get and body variabels
+
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(express.static('./static'));
+
+//
 
 //
 
@@ -34,14 +34,10 @@ app.use(express.json());
 ----- */
 
 const uri = process.env.URI;
-console.log(`-- TBL LOG --: process`, process);
-console.log(`-- TBL LOG :: process`, process);
-console.log("Super duper thingyfi: process", process);
-console.log("uri", uri);
 
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
 });
 connect();
 
@@ -59,7 +55,7 @@ const PORT = process.env.PORT || 5500;
 /* This is basicly an API, it returns pure data for our enjoyment
 ----- */
 
-require("./tempAPI-example.js")(app);
+require('./tempAPI-example.js')(app);
 
 //
 
@@ -70,15 +66,15 @@ require("./tempAPI-example.js")(app);
 
 async function connect() {
   const connection = await client.connect();
-  const db = client.db("CoffeeBooks");
-  const bookList = db.collection("BookList");
-  const userList = db.collection("users");
+  const db = client.db('CoffeeBooks');
+  const bookList = db.collection('BookList');
+  const userList = db.collection('users');
 
   // middleWares();
 
   app.listen(PORT, console.log(`-- Server is running on PORT: ${PORT} --`));
 
-  require(dir + "routes.js")(bookList, userList, express, app);
+  require(dir + 'routes.js')(bookList, userList, express, app);
 
   //!  client.close();
 }

@@ -1,9 +1,9 @@
 /* Require npms
 ----- */
-const { ObjectId } = require("mongodb");
-const cors = require("cors");
-const bcrypt = require("bcryptjs");
-const dir = __dirname + "/";
+const { ObjectId } = require('mongodb');
+const cors = require('cors');
+const bcrypt = require('bcryptjs');
+const dir = __dirname + '/';
 
 //
 module.exports = (bookList, userList, express, app) => {
@@ -24,20 +24,20 @@ module.exports = (bookList, userList, express, app) => {
   /* Authoritisation
 ----- */
 
-  const auth = require("./auth.js");
+  const auth = require('./auth.js');
 
-  app.post("/register", register);
-  app.post("/login", login);
-  app.get("/users", auth, async (req, res) => {
+  app.post('/register', register);
+  app.post('/login', login);
+  app.get('/users', auth, async (req, res) => {
     //res.send(await /*DB FOR USERS*/);
   });
   //befonts.com/alegra-sans-serif-font.html
 
-  https: async function register(req, res) {
+  async function register(req, res) {
     let user = {
       email: req.body.email,
       nickname: req.body.nickname,
-      password: req.body.password
+      password: req.body.password,
     };
     if (user.email == null)
       return res.send(`Incorrect form, email was null or emptey`);
@@ -75,34 +75,42 @@ module.exports = (bookList, userList, express, app) => {
   /* Routes
 ----- */
   // returns homepage
-  app.get("/", (req, res) => {
-    res.sendFile(dir + "html.html");
+  app.get('/', (req, res) => {
+    res.sendFile(dir + 'html.html');
   });
 
   //! Change API routes to api prefixes ie. '/api/books' 'api/books/:id'
   // retuns all avalible books
-  app.get("/books", async (req, res) => {
+  app.get('/books', async (req, res) => {
     try {
       res.status(201).send(await bookList.find().toArray());
+      console.log(
+        `🚀-- TBL LOG : ~ file: routes.js ~ line 88 ~ app.get ~ bookList`,
+        bookList
+      );
       // // ! ERROR CODE: Topology is closed, please connect
     } catch (error) {
       res.send(error.message);
     }
   });
 
-  app.get("/books/:id", async (req, res) => {
+  app.get('/books/:id', async (req, res) => {
     try {
-      console.log("THIS IS BOOKS");
+      console.log('THIS IS BOOKS');
       console.log(req.params.id);
 
       res
         .status(201)
         .send(await bookList.findOne({ _id: ObjectId(req.params.id) }));
+      console.log(
+        `🚀-- TBL LOG : ~ file: routes.js ~ line 103 ~ app.get ~ bookList`,
+        bookList
+      );
     } catch (error) {
       res.status(500).send(error.message);
     }
   });
-  app.get("/*", (req, res) => {
+  app.get('/*', (req, res) => {
     res.status(404).send(`Page Not Found`);
   });
 };
