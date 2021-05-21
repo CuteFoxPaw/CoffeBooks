@@ -144,6 +144,5 @@ module.exports = (bookList, userList, express, app) => {
 
 //https://befonts.com/alegra-sans-serif-font.html
 
-let check;
 //
 
