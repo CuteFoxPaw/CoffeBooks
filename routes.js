@@ -4,6 +4,7 @@ const { ObjectId } = require('mongodb');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const dir = __dirname + '/';
+const jwt = require('jsonwebtoken');
 
 //
 module.exports = (bookList, userList, express, app) => {
@@ -39,9 +40,10 @@ module.exports = (bookList, userList, express, app) => {
       nickname: req.body.nickname,
       password: req.body.password,
     };
+
+    // Check inputs & user callbacks
     if (user.email == null)
       return res.send(`Incorrect form, email was null or emptey`);
-
     if (user.password == null)
       return res.send(`Incorrect form, a password was null or emptey`);
     if (await userList.findOne({ email: user.email }))
@@ -70,7 +72,29 @@ module.exports = (bookList, userList, express, app) => {
       }
     });
   }
-  async function login(req, res) {}
+  async function login(req, res) {
+    let user = req.body;
+
+    try {
+      // Searches in db for specific email
+      let dbUser = await userList.findOne({ email: user.email });
+
+      if (!dbUser) return res.send(`Email '${user.email}' was not found.`);
+
+      bcrypt.compare(user.password, dbUser.password, (err, result) => {
+        if (err) return res.status(500).send(`Compare Error`);
+        if (!result)
+          return res.status(500).send(`Loggin Error: Passwords does not match`);
+
+        //! MISSING SYNTAX!  WHAT SHOULD 2:ND ARG BE IN JWT SIGN IN? REPL GOT PROCESS.ENV.SECRET
+        const token = jwt.sign(dbUser,/* // ! What shoudl be here? */ , { expireIn: 180 });
+
+        res.send(token); // This means you've succesfully logged in
+      });
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
+  }
 
   /* Routes
 ----- */
@@ -79,7 +103,7 @@ module.exports = (bookList, userList, express, app) => {
     res.sendFile(dir + 'html.html');
   });
 
-  //! Change API routes to api prefixes ie. '/api/books' 'api/books/:id'
+  //TODO Change API routes to api prefixes ie. '/api/books' 'api/books/:id'
   // retuns all avalible books
   app.get('/books', async (req, res) => {
     try {
