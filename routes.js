@@ -40,6 +40,7 @@ module.exports = (bookList, userList, express, app) => {
           `Error, something went wrong, please make sure you've filled out all fields.
         Error message: ${err.message}`
           //! Error message: Illegal arguments: undefined, number
+          //! Fix Reg, likley to be unhandel input arguments as well as not a object sent to db?
         );
       try {
         await userList.insertOne(user);
