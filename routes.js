@@ -15,16 +15,6 @@ module.exports = (bookList, userList, express, app) => {
   TODO: Fix Auth routes
   TODO: FIX JWT
  */
-  console.log(`sadsad
-sadasd as dA
-     halös hfäsal f
-Lets 
-      Try  how
-      tis
-  mat work
-  \n
-  asdk
-asöld`);
 
   // Allows cross origin request
   app.use(cors());
@@ -35,22 +25,23 @@ asöld`);
   /* Authoritisation
 ----- */
 
-  const auth = require('./auth.js');
+  const authToken = require('./auth.js');
 
   app.post('/register', register);
   app.post('/login', login);
-  app.get('/users', auth, async (req, res) => {
-    //res.send(await /*DB FOR USERS*/);
+  app.get('/users', authToken, async (req, res) => {
+    res.send(await userList.find().toArray());
   });
 
   async function register(req, res) {
     let user = {
       email: req.body.email,
       nickname: req.body.nickname,
-      password: req.body.password
+      password: req.body.password,
     };
 
     // Check inputs & user callbacks
+    //TODO Check for correct inputed email
     if (user.email == null)
       return res.send(`Incorrect form, email was null or emptey`);
     if (user.password == null)
@@ -75,7 +66,9 @@ asöld`);
       try {
         await userList.insertOne(user);
         //?await userList.deleteMany({}); // Deletes ALL documents in collection
-        res.send(`Users ${user.nickname} has succsessfully registerd`);
+        res
+          .status(201)
+          .send(`Users ${user.nickname} has succsessfully registerd`);
       } catch (err) {
         // console.log(err.message)
       }
@@ -95,8 +88,7 @@ asöld`);
         if (!result)
           return res.status(500).send(`Loggin Error: Passwords does not match`);
 
-        //! Check Teams-YT-V-JWT
-        const token = jwt.sign(dbUser, { expireIn: 180 });
+        let token = generateToken(dbUser);
 
         //TODO: Store token with cookies
         res.send(token); // This means you've succesfully logged in
@@ -106,8 +98,17 @@ asöld`);
     }
   }
 
+  function generateToken(user) {
+    // signs a token for our user
+    secret = 'asdasd';
+    let { id } = user;
+    let token = jwt.sign({ id: id }, secret, { expiresIn: 60 });
+    return token;
+  }
+
   /* Routes
 ----- */
+
   // returns homepage
   app.get('/', (req, res) => {
     res.sendFile(dir + 'html.html');
