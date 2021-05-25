@@ -16,7 +16,7 @@ require('dotenv').config();
 ----- */
 
 const logger = require('morgan');
-//app.use(logger('dev'));
+app.use(logger('dev'));
 
 //function middleWares()
 
