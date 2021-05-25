@@ -5,7 +5,7 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const dir = __dirname + '/';
 const jwt = require('jsonwebtoken');
-
+console.log = require('./no-indent-logger')(console.log);
 //
 module.exports = (bookList, userList, express, app) => {
   /* Routes
@@ -15,6 +15,16 @@ module.exports = (bookList, userList, express, app) => {
   TODO: Fix Auth routes
   TODO: FIX JWT
  */
+  console.log(`sadsad
+sadasd as dA
+     halös hfäsal f
+Lets 
+      Try  how
+      tis
+  mat work
+  \n
+  asdk
+asöld`);
 
   // Allows cross origin request
   app.use(cors());
@@ -32,13 +42,12 @@ module.exports = (bookList, userList, express, app) => {
   app.get('/users', auth, async (req, res) => {
     //res.send(await /*DB FOR USERS*/);
   });
-  
 
   async function register(req, res) {
     let user = {
       email: req.body.email,
       nickname: req.body.nickname,
-      password: req.body.password,
+      password: req.body.password
     };
 
     // Check inputs & user callbacks
@@ -86,9 +95,10 @@ module.exports = (bookList, userList, express, app) => {
         if (!result)
           return res.status(500).send(`Loggin Error: Passwords does not match`);
 
-        //! MISSING SYNTAX!  WHAT SHOULD 2:ND ARG BE IN JWT SIGN IN? REPL GOT PROCESS.ENV.SECRET
-        const token = jwt.sign(dbUser,/* // ! What shoudl be here? */ , { expireIn: 180 });
+        //! Check Teams-YT-V-JWT
+        const token = jwt.sign(dbUser, { expireIn: 180 });
 
+        //TODO: Store token with cookies
         res.send(token); // This means you've succesfully logged in
       });
     } catch (err) {
@@ -107,11 +117,8 @@ module.exports = (bookList, userList, express, app) => {
   // retuns all avalible books
   app.get('/books', async (req, res) => {
     try {
-      res.status(201).send(await bookList.find().toArray());
-      console.log(
-        `🚀-- TBL LOG : ~ file: routes.js ~ line 88 ~ app.get ~ bookList`,
-        bookList
-      );
+      res.status(200).send(await bookList.find().toArray());
+
       // // ! ERROR CODE: Topology is closed, please connect
     } catch (error) {
       res.send(error.message);
@@ -124,14 +131,34 @@ module.exports = (bookList, userList, express, app) => {
       console.log(req.params.id);
 
       res
-        .status(201)
+        .status(200)
         .send(await bookList.findOne({ _id: ObjectId(req.params.id) }));
-      console.log(
-        `🚀-- TBL LOG : ~ file: routes.js ~ line 103 ~ app.get ~ bookList`,
-        bookList
-      );
     } catch (error) {
       res.status(500).send(error.message);
+    }
+  });
+  /*
+  app.get('/books/delete/:id', (req, res) => {
+    try {
+      //! Check if user are logged in
+      //! Delete object from client as well!
+      await bookList.deleteOne({_id:ObjectId(req.params.id)});
+      res.status(202).send(`Delete of id: ${req.params.id} accepted`);
+      
+    } catch (error) {
+      res.status(403).send('Error, not auhtorised or other error occured');
+    }
+  });*/
+  app.get('/books/:tag/:arg', async (req, res) => {
+    try {
+      list = await bookList
+        .find({ [req.params.tag]: req.params.arg })
+        .toArray();
+      if (list.lenght == 0)
+        res.status(404).send(`Error 404: Tag or argument not found`);
+      res.status(200).send(list);
+    } catch (error) {
+      res.send(error.message);
     }
   });
   app.get('/*', (req, res) => {
@@ -145,4 +172,3 @@ module.exports = (bookList, userList, express, app) => {
 //https://befonts.com/alegra-sans-serif-font.html
 
 //
-
