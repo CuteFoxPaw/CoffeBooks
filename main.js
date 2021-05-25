@@ -37,7 +37,7 @@ const uri = process.env.URI;
 
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
-  useUnifiedTopology: true,
+  useUnifiedTopology: true
 });
 connect();
 
@@ -126,7 +126,7 @@ https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#4xx_client_errors
 -- Startups --
 • Node Startup: https://replit.com/@RichardTE18IT/21-02-16NodeTraining#index.js
 • Node Startup: https://replit.com/@RichardTE18IT/nodetuesday21-02-10#index.js 
-
+! COOKIES ARE NEEDED!
  */
 // Sync vs extension https://itnext.io/settings-sync-with-vs-code-c3d4f126989
 /*
