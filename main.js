@@ -158,3 +158,12 @@ git pull origin master// gets changes
 // reset local branch
   https://stackoverflow.com/questions/1125968/how-do-i-force-git-pull-to-overwrite-local-files 
 */
+/* Usage
+
+#Replace console.log
+console.log = require('./path-to-vendor/vendor/no_indent_logger')(console.log)
+
+#as log
+const log = require('./path-to-vendor/vendor/no_indent_logger')(console.log)
+
+*/
