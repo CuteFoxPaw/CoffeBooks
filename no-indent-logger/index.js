@@ -1,4 +1,4 @@
-module.exports = function logger(console_log) {
+module.exports = function (console_log) {
     return function (...args) {
         const new_args = args.map((arg) => {
             if (typeof arg == 'string') {
