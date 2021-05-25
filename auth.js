@@ -9,13 +9,9 @@ module.exports = (req, res, next) => {
   try {
     let userToken = req.query.token;
 
-    let check = jwt.verify(userToken, tokenFromUser);
-    //! Shouldn't we make check for check if true? See following
-    /*if (check) {
-      next();
-    } else {
-      return;
-    }*/
+    userToken = jwt.verify(userToken, tokenFromUser);
+    req.userId = userToken.id;
+
     next();
   } catch (err) {
     res.status(401).send({ error: err.message });
