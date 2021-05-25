@@ -107,7 +107,8 @@ TODO: Develop everything backend, afterward develop frontend
 404 - client problem
 400 - Bad Request; The server cannot or will not process the request due to an apparent client error 
 304 - all ok, not modified
-201 - all ok
+201 - created
+200 - all ok
 
 https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#4xx_client_errors
 */
