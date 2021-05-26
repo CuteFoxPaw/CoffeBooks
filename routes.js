@@ -3,8 +3,10 @@
 const { ObjectId } = require('mongodb');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
-const dir = __dirname + '/';
 const jwt = require('jsonwebtoken');
+const cookies = require('cookie-parser');
+const dir = __dirname + '/';
+
 console.log = require('./no-indent-logger')(console.log);
 //
 module.exports = (bookList, userList, express, app) => {
@@ -37,7 +39,7 @@ module.exports = (bookList, userList, express, app) => {
     let user = {
       email: req.body.email,
       nickname: req.body.nickname,
-      password: req.body.password,
+      password: req.body.password
     };
 
     // Check inputs & user callbacks
@@ -138,35 +140,55 @@ module.exports = (bookList, userList, express, app) => {
       res.status(500).send(error.message);
     }
   });
-  /*
-  app.get('/books/delete/:id', (req, res) => {
-    try {
-      //! Check if user are logged in
-      //! Delete object from client as well!
-      await bookList.deleteOne({_id:ObjectId(req.params.id)});
-      res.status(202).send(`Delete of id: ${req.params.id} accepted`);
-      
-    } catch (error) {
-      res.status(403).send('Error, not auhtorised or other error occured');
-    }
-  });*/
+
   app.get('/books/:tag/:arg', async (req, res) => {
     try {
-      list = await bookList
-        .find({ [req.params.tag]: req.params.arg })
-        .toArray();
-      if (list.lenght == 0)
+      //db.stuff.find( { foo: /^bar$/i } );
+      const filter = new RegExp(/^req.params.arg$/, 'i');
+      const list = await bookList.find({ [req.params.tag]: filter }).toArray();
+
+      if (list.length == 0 || typeof list == 'undefined')
         res.status(404).send(`Error 404: Tag or argument not found`);
       res.status(200).send(list);
     } catch (error) {
       res.send(error.message);
     }
   });
+
+  app.post('API/book/create', (req, res) => {
+    // TODO: Check for exisitng books
+    let book = {
+      title: req.body.title,
+      serie: req.body.serie,
+      releaseYear: req.body.releaseYear,
+      auhtor: req.body.auhtor,
+      comments: {},
+      genre: [],
+      title: req.body.title,
+      title: req.body.title,
+      scoreTotal: 0,
+      scoreVotes: 0
+    };
+
+    bookList.insertOne(book);
+    res.status(201).send(`Book ${book.title} created`);
+  });
+  app.get('/API/book/delete/:id', async (req, res) => {
+    try {
+      //! Check if user are logged in
+      //! Delete object from client as well!
+      //! Check id != null
+      await bookList.deleteOne({ _id: ObjectId(req.params.id) });
+      res.status(202).send(`Delete of id: ${req.params.id} accepted`);
+    } catch (error) {
+      res.status(403).send('Error, not auhtorised or other error occured');
+    }
+  });
+
   app.get('/*', (req, res) => {
     res.status(404).send(`Page Not Found`);
   });
 };
-
 /* Font links
 ----- */
 
