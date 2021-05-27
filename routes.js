@@ -9,13 +9,16 @@ const dir = __dirname + '/';
 
 console.log = require('./no-indent-logger')(console.log);
 //
-module.exports = (bookList, userList, express, app, envCookies) => {
+module.exports = (bookList, userList, express, app) => {
   /* Routes
 ----- */
 
   /*
-  TODO: Fix Auth routes
-  TODO: FIX JWT
+  TODO: LOGOUT, destroy cookie, if time destroy jwt
+  1. Set a reasonable expiration time on tokens
+  2. Delete the stored token from client side upon log out
+  3. Have DB of no longer active tokens that still have some time to live
+  4. Query provided token against The Blacklist on every authorized request
  */
 
   // Allows cross origin request
@@ -33,8 +36,6 @@ module.exports = (bookList, userList, express, app, envCookies) => {
   app.post('/register', register);
   app.post('/login', login);
   app.get('/users', authToken, async (req, res) => {
-    console.log('Asignment');
-
     res.send(await userList.find().toArray());
   });
 
@@ -75,7 +76,7 @@ module.exports = (bookList, userList, express, app, envCookies) => {
           .status(201)
           .send(`Users ${user.nickname} has succsessfully registerd`);
       } catch (err) {
-        // console.log(err.message)
+        console.log(err.message);
       }
     });
   }
@@ -97,7 +98,7 @@ module.exports = (bookList, userList, express, app, envCookies) => {
         let token = generateToken(dbUser);
         //req.headers.token = token;
         // maxAge: mil-seconds, 60 000 = 1 min
-        res.cookie('token', token, { maxAge: 600000 });
+        res.cookie('token', token, { maxAge: 1000 * 3600 * 24 });
 
         //TODO: Store token with cookies
         res.send(token); // This means you've succesfully logged in
@@ -133,7 +134,9 @@ module.exports = (bookList, userList, express, app, envCookies) => {
       if (err) return res.sendStatus(403);
       req.user = user;
       next();
-    });*/ try {
+    });*/
+    /* 
+     try {
       let tokenFromUser = req.cookies['token'];
 
       //if (token == null || token == typeof undefined)
@@ -147,9 +150,7 @@ module.exports = (bookList, userList, express, app, envCookies) => {
         process.env.ACCESS_TOKEN_SECRET,
         (err, id) => {
           if (err) {
-            console.log('Error FIERD!');
-
-            return res.sendStatus(403);
+            return res.status(403).send(err.message);
           }
           console.log('Asignment');
           req.userid = tokenFromUser.id;
@@ -163,7 +164,7 @@ module.exports = (bookList, userList, express, app, envCookies) => {
       //next();
     } catch (err) {
       res.status(401).send({ error: err.message });
-    }
+    }*/
   }
 
   app.get('/logins', authingToken, (req, res) => {
@@ -179,7 +180,7 @@ module.exports = (bookList, userList, express, app, envCookies) => {
 
     let { id } = user;
     let token = jwt.sign({ id: id }, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: 600,
+      expiresIn: '1d',
     });
     return token;
   }

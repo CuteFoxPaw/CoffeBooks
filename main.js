@@ -6,13 +6,13 @@ const dir = __dirname + '/';
 const MongoClient = require('mongodb').MongoClient;
 
 // Allows the use of enviorment variables
-const env = require('dotenv').config();
-const envCookies = require('dotenv').config({ path: `.env.cookiemonster` });
+/*const env =*/ require('dotenv').config();
+//const envCookies = require('dotenv').config({ path: `.env.cookiemonster` });
 
 //This  is a comment by david!!!
 
 //
-console.log(envCookies);
+//console.log(envCookies);
 
 /* Middlewares
 ----- */
@@ -76,7 +76,7 @@ async function connect() {
 
   app.listen(PORT, console.log(`-- Server is running on PORT: ${PORT} --`));
 
-  require(dir + 'routes.js')(bookList, userList, express, app, envCookies);
+  require(dir + 'routes.js')(bookList, userList, express, app);
 
   //!  client.close();
 }
