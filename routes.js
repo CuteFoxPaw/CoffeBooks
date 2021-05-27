@@ -4,12 +4,12 @@ const { ObjectId } = require('mongodb');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const cookies = require('cookie-parser');
+const cookieParser = require('cookie-parser');
 const dir = __dirname + '/';
 
 console.log = require('./no-indent-logger')(console.log);
 //
-module.exports = (bookList, userList, express, app) => {
+module.exports = (bookList, userList, express, app, envCookies) => {
   /* Routes
 ----- */
 
@@ -24,6 +24,7 @@ module.exports = (bookList, userList, express, app) => {
   // app.use(express.urlencoded({ extended: false }));
   // app.use(express.json());
 
+  app.use(cookieParser());
   /* Authoritisation
 ----- */
 
@@ -32,6 +33,8 @@ module.exports = (bookList, userList, express, app) => {
   app.post('/register', register);
   app.post('/login', login);
   app.get('/users', authToken, async (req, res) => {
+    console.log('Asignment');
+
     res.send(await userList.find().toArray());
   });
 
@@ -39,7 +42,7 @@ module.exports = (bookList, userList, express, app) => {
     let user = {
       email: req.body.email,
       nickname: req.body.nickname,
-      password: req.body.password
+      password: req.body.password,
     };
 
     // Check inputs & user callbacks
@@ -77,9 +80,10 @@ module.exports = (bookList, userList, express, app) => {
     });
   }
   async function login(req, res) {
-    let user = req.body;
-
     try {
+      let user = req.body;
+
+      //let tokenFromUser = req.headers.token;
       // Searches in db for specific email
       let dbUser = await userList.findOne({ email: user.email });
 
@@ -91,6 +95,9 @@ module.exports = (bookList, userList, express, app) => {
           return res.status(500).send(`Loggin Error: Passwords does not match`);
 
         let token = generateToken(dbUser);
+        //req.headers.token = token;
+        // maxAge: mil-seconds, 60 000 = 1 min
+        res.cookie('token', token, { maxAge: 600000 });
 
         //TODO: Store token with cookies
         res.send(token); // This means you've succesfully logged in
@@ -99,12 +106,81 @@ module.exports = (bookList, userList, express, app) => {
       res.status(500).send(err.message);
     }
   }
+  /*
+    const username = req.body.username;
+    const user = { user: username };
+    const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
+    res.json({ accessToken: accessToken });
+  }
+  const post = [
+    { username: 'kyle', title: 'post 1' },
+    { username: 'jim', title: 'post 2' },
+  ];
+*/
+  function authingToken(req, res, next) {
+    /* const token = req.headers.token;
+    console.log(
+      `🚀 ~ file: routes.js ~ line 119 ~ authingToken ~ req.headers`,
+      req.headers
+    );
+    console.log(
+      `🚀 ~ file: routes.js ~ line 119 ~ authingToken ~ token`,
+      token
+    );
+    if (token == null || token == typeof undefined) return res.sendStatus(401);
 
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+      if (err) return res.sendStatus(403);
+      req.user = user;
+      next();
+    });*/ try {
+      let tokenFromUser = req.cookies['token'];
+
+      //if (token == null || token == typeof undefined)
+      // return res.sendStatus(401);
+
+      // let userToken = req.query.token;
+      // console.log(`🚀 ~ file: auth.js ~ line 12 ~ userToken`, userToken);
+
+      tokenFromUser = jwt.verify(
+        tokenFromUser,
+        process.env.ACCESS_TOKEN_SECRET,
+        (err, id) => {
+          if (err) {
+            console.log('Error FIERD!');
+
+            return res.sendStatus(403);
+          }
+          console.log('Asignment');
+          req.userid = tokenFromUser.id;
+          console.log('Asignment');
+
+          next();
+        }
+      );
+      // req.userId = userToken.id;
+
+      //next();
+    } catch (err) {
+      res.status(401).send({ error: err.message });
+    }
+  }
+
+  app.get('/logins', authingToken, (req, res) => {
+    console.log('---');
+    res.json(post.filter((post) => post.username == req.user.name));
+    console.log(
+      `🚀 ~ file: routes.js ~ line 139 ~ app.get ~ req.user`,
+      req.user
+    );
+  });
   function generateToken(user) {
     // signs a token for our user
-    secret = 'asdasd';
+
     let { id } = user;
-    let token = jwt.sign({ id: id }, secret, { expiresIn: 60 });
+    let token = jwt.sign({ id: id }, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: 600,
+    });
     return token;
   }
 
@@ -167,7 +243,8 @@ module.exports = (bookList, userList, express, app) => {
       title: req.body.title,
       title: req.body.title,
       scoreTotal: 0,
-      scoreVotes: 0
+      scoreVotes: 0,
+      creator: req.user.id,
     };
 
     bookList.insertOne(book);
