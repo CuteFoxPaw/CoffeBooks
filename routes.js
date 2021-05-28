@@ -4,7 +4,7 @@ const { ObjectId } = require('mongodb');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const cookies = require('cookie-parser');
+const cookieParser = require('cookie-parser');
 const dir = __dirname + '/';
 
 console.log = require('./no-indent-logger')(console.log);
@@ -37,7 +37,7 @@ module.exports = (bookList, userList, express, app) => {
 
   async function register(req, res) {
     let user = {
-      email: req.body.email,
+      email: toLowerCase(req.body.email),
       nickname: req.body.nickname,
       password: req.body.password
     };
@@ -78,7 +78,7 @@ module.exports = (bookList, userList, express, app) => {
   }
   async function login(req, res) {
     let user = req.body;
-
+    user.email = toLowerCase(user.email);
     try {
       // Searches in db for specific email
       let dbUser = await userList.findOne({ email: user.email });
