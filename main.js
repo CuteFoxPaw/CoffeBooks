@@ -4,13 +4,16 @@ const express = require('express');
 const app = express();
 const dir = __dirname + '/';
 const MongoClient = require('mongodb').MongoClient;
+const cookieParser = require('cookie-parser');
 
 // Allows the use of enviorment variables
-require('dotenv').config();
+/*const env =*/ require('dotenv').config();
+//const envCookies = require('dotenv').config({ path: `.env.cookiemonster` });
 
 //This  is a comment by david!!!
 
 //
+//console.log(envCookies);
 
 /* Middlewares
 ----- */
@@ -25,7 +28,7 @@ app.use(logger('dev'));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(express.static('./static'));
-
+app.use(cookieParser());
 //
 
 //

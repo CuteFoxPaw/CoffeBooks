@@ -14,8 +14,11 @@ module.exports = (bookList, userList, express, app) => {
 ----- */
 
   /*
-  TODO: Fix Auth routes
-  TODO: FIX JWT
+  TODO: LOGOUT, destroy cookie, if time destroy jwt
+  1. Set a reasonable expiration time on tokens
+  2. Delete the stored token from client side upon log out
+  3. Have DB of no longer active tokens that still have some time to live
+  4. Query provided token against The Blacklist on every authorized request
  */
 
   // Allows cross origin request
@@ -24,6 +27,7 @@ module.exports = (bookList, userList, express, app) => {
   // app.use(express.urlencoded({ extended: false }));
   // app.use(express.json());
 
+//!  app.use(cookieParser());
   /* Authoritisation
 ----- */
 
@@ -39,7 +43,7 @@ module.exports = (bookList, userList, express, app) => {
     let user = {
       email: toLowerCase(req.body.email),
       nickname: req.body.nickname,
-      password: req.body.password
+      password: req.body.password,
     };
 
     // Check inputs & user callbacks
@@ -72,39 +76,115 @@ module.exports = (bookList, userList, express, app) => {
           .status(201)
           .send(`Users ${user.nickname} has succsessfully registerd`);
       } catch (err) {
-        // console.log(err.message)
+        console.log(err.message);
       }
     });
   }
   async function login(req, res) {
     let user = req.body;
-    user.email = toLowerCase(user.email);
+    user.email = user.email.toLowerCase();
     try {
+      let user = req.body;
+
+      //let tokenFromUser = req.headers.token;
       // Searches in db for specific email
       let dbUser = await userList.findOne({ email: user.email });
 
       if (!dbUser) return res.send(`Email '${user.email}' was not found.`);
 
       bcrypt.compare(user.password, dbUser.password, (err, result) => {
-        if (err) return res.status(500).send(`Compare Error`);
+        if (err) return res.status(401).send(`Compare Error`);
         if (!result)
-          return res.status(500).send(`Loggin Error: Passwords does not match`);
+          return res.status(401).send(`Loggin Error: Passwords does not match`);
 
         let token = generateToken(dbUser);
+        //req.headers.token = token;
+        // maxAge: mil-seconds, 60 000 = 1 min
+        res.cookie('token', token, { maxAge: 1000 * 3600 * 24/*, httpOnly:true*/, sameSite:'lax' });
 
         //TODO: Store token with cookies
-        res.send(token); // This means you've succesfully logged in
+       // res.send(token); // This means you've succesfully logged in
+       res.send('succ');
       });
     } catch (err) {
-      res.status(500).send(err.message);
+      res.status(401).send(err.message);
     }
   }
+  /*
+    const username = req.body.username;
+    const user = { user: username };
+    const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
+    res.json({ accessToken: accessToken });
+  }
+  const post = [
+    { username: 'kyle', title: 'post 1' },
+    { username: 'jim', title: 'post 2' },
+  ];
+*/
+  function authingToken(req, res, next) {
+    /* const token = req.headers.token;
+    console.log(
+      `🚀 ~ file: routes.js ~ line 119 ~ authingToken ~ req.headers`,
+      req.headers
+    );
+    console.log(
+      `🚀 ~ file: routes.js ~ line 119 ~ authingToken ~ token`,
+      token
+    );
+    if (token == null || token == typeof undefined) return res.sendStatus(401);
 
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+      if (err) return res.sendStatus(403);
+      req.user = user;
+      next();
+    });*/
+    /* 
+     try {
+      let tokenFromUser = req.cookies['token'];
+
+      //if (token == null || token == typeof undefined)
+      // return res.sendStatus(401);
+
+      // let userToken = req.query.token;
+      // console.log(`🚀 ~ file: auth.js ~ line 12 ~ userToken`, userToken);
+
+      tokenFromUser = jwt.verify(
+        tokenFromUser,
+        process.env.ACCESS_TOKEN_SECRET,
+        (err, id) => {
+          if (err) {
+            return res.status(403).send(err.message);
+          }
+          console.log('Asignment');
+          req.userid = tokenFromUser.id;
+          console.log('Asignment');
+
+          next();
+        }
+      );
+      // req.userId = userToken.id;
+
+      //next();
+    } catch (err) {
+      res.status(401).send({ error: err.message });
+    }*/
+  }
+
+  /*app.get('/logins', authingToken, (req, res) => {
+    console.log('---');
+    res.json(post.filter((post) => post.username == req.user.name));
+    console.log(
+      `🚀 ~ file: routes.js ~ line 139 ~ app.get ~ req.user`,
+      req.user
+    );
+  });*/
   function generateToken(user) {
     // signs a token for our user
-    secret = 'asdasd';
-    let { id } = user;
-    let token = jwt.sign({ id: id }, secret, { expiresIn: 60 });
+//console.log(user);
+    let { _id } = user;
+    let token = jwt.sign({_id}, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: '1d',
+    });
     return token;
   }
 
@@ -167,7 +247,8 @@ module.exports = (bookList, userList, express, app) => {
       title: req.body.title,
       title: req.body.title,
       scoreTotal: 0,
-      scoreVotes: 0
+      scoreVotes: 0,
+      creator: req.user.id,
     };
 
     bookList.insertOne(book);
