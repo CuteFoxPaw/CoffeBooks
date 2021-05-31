@@ -233,11 +233,12 @@ module.exports = (bookList, userList, express, app) => {
       bookList.replaceOne(
         { _id: ObjectId(req.body.id) },
         {
-          title: req.body.title || dbBook.title,
-          serie: req.body.serie || dbBook.serie,
-          releaseYear: req.body.releaseYear || dbBook.releaseYear,
-          author: req.body.author || dbBook.author,
-          synopsis: req.body.synopsis || dbBook.synopsis,
+          title: encodeCharacters(req.body.title) || dbBook.title,
+          serie: encodeCharacters(req.body.serie) || dbBook.serie,
+          releaseYear:
+            encodeCharacters(req.body.releaseYear) || dbBook.releaseYear,
+          author: encodeCharacters(req.body.author) || dbBook.author,
+          synopsis: encodeCharacters(req.body.synopsis) || dbBook.synopsis,
           comments: dbBook.comments,
           scoreTotal: 0,
           scoreVotes: 0,

@@ -50,7 +50,7 @@
 //   console.log('let bookId', bookId);
 //   document.getElementById(bookId).innerHTML = output;
 // }
-
+/*
 async function doFetch() {
   let data = new FormData();
   data.append('email', email);
@@ -66,7 +66,7 @@ async function doFetch() {
   );
   let tokenFS = await response.text();
   console.log(tokenFS);
-}
+}*/
 
 renderPage();
 async function renderPage() {
