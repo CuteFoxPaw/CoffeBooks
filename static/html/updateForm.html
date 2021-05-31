@@ -1,0 +1,32 @@
+<button id="" style="height: 25px" onclick="removeElement('#bookUpdateId')">
+  Go back
+</button>
+<div
+  class="update"
+  style="margin: auto; padding: 1em; background-color: rgb(100, 100, 100)"
+>
+  <h2>Update Book In Databse</h2>
+
+  <form
+    id="formUpdate"
+    style="
+      display: flex;
+      justify-content: center;
+      padding: 0.5em;
+      flex-direction: column;
+    "
+  >
+    <input type="text" id="updTitle" placeholder="title" /><br />
+    <input type="text" id="updSerie" placeholder="serie" /><br />
+    <input type="text" id="updAuthor" placeholder="author" /><br />
+    <input type="text" id="updYear" placeholder="year" /><br />
+    <textarea
+      name="updSynopsis"
+      id="updSynopsis"
+      cols="30"
+      rows="10"
+    ></textarea>
+    <input type="hidden" id="updId" />
+    <input type="submit" value="Update Book To Database" id="btnUpdBook" />
+  </form>
+</div>

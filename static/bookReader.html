@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Gets firebase libaries -->
+    <script src="https://www.gstatic.com/firebasejs/8.2.9/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.9/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.9/firebase-auth.js"></script>
+    <!-- Gets FirebaseKey -->
+    <script src="validation/key.js"></script>
+    <!-- Renderfunctions -->
+    <script src="render.js" defer></script>
+    <script src="crud.js" defer></script>
+
+    <!-- The docuemnt who does stuff -->
+    <script src="authRel.js" defer></script>
+    <script src="bookHandler.js" defer></script>
+
+
+    <!-- Get / Handle Books  -->
+    <!-- <script src="getBooks.js" defer></script> -->
+    <!-- Gets stylsheet -->
+    <link rel="stylesheet" href="db/layouts/homepage/homepage.css" />
+    <title>FireBookList</title>
+
+<body class="gridcontainer">
+
+        <div class="sideL"><!-- emptey --></div>
+
+        <div class="maincontent">
+            <div class="nav" id="navbar"><nav>
+              <ul>
+                <li class="li1">
+                  <button onclick="location.href='/'">Home</button>
+                </li>
+                <li class="li2"><h1>My Book List</h1></li>
+                <li class="li3" id="singOutButton"></li>
+                <li id="userAuthControls"></li>
+              </ul>
+            </nav></div>
+            <div class="header" style="display:flex;">
+               <div style="flex:1;" id="title"></div>
+               <div style="flex:0; min-width:78px;" id="bookDoer"><!-- <button onclick="location.href='{{updatePath}}'">Update Book</button>
+               <button onclick="location.href='{{deletePath}}'">Delete Book</button> -->
+               </div>
+            </div>           
+            <div class="contentBox" style="display: flex;">    
+                    <div class="review" id="info" style="flex:0">
+                      <h3> Information</h3><hr>
+                      </div>  
+                  
+                               
+                    <div class="synopsis" id="synopsis" style="flex:1">
+                      <h3>Synopsis</h3><hr>
+                      <br>
+                    </div>
+                      
+                    <!-- <div class="review" ><h3> Reviews</h3><hr>
+                    
+                    <button onclick="location.href='{{crReviewPath}}'">Create review</button><hr>
+                    <br>{{reviews}}<br>
+                    </div>
+ -->
+                      <div class="synopsis" id="otherBooks"></div>  
+
+
+                    <div class="synopsis" id="creatorAndEditor">
+                      <h3>Creator And Editors</h3><hr>
+                      </div>
+
+
+               <form action="addreview.html" method="post"></form>
+            </div>
+            <div class="footer">
+              <h4 style="color:#333; text-align:center;">© 2020 - 2020 <i>My Book List </i> All Rigts Reserved</h4>
+            </div>
+           
+        </div>
+        <div class="sideR"><!-- emptey --></div>
+ 
+
+</body>
+
+</html>

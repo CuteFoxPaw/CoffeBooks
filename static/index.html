@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Renderfunctions -->
+    <script src="./js/render.js" defer></script>
+
+    <!-- The docuemnt who does stuff -->
+    <!-- <script src="js/main.js" defer></script> -->
+    <script src="js/crud.js" defer></script>
+
+    <!-- Get / Handle Books  -->
+    <script src="./js/getBooks.js" defer></script>
+    <!-- Gets stylsheet -->
+    <link rel="stylesheet" href="homepage.css" />
+    <title>FireBookList</title>
+  </head>
+  <body>
+    <!-- Create login form here -->
+    <!-- TODO Create div usefyull -->
+
+    <div class="gridcontainer" i>
+      <!-- use assoc array, with ['header']->titel etc  -->
+
+      <div class="sideL"><!-- emptey --></div>
+
+      <div class="maincontent">
+        <div class="nav" id="navbar">
+          <nav>
+            <ul>
+              <li class="li1">
+                <button onclick="location.href='{{homePath}}'">Home</button>
+              </li>
+              <li class="li2"><h1>My Book List</h1></li>
+              <li class="li3" id="singOutButton"></li>
+            </ul>
+          </nav>
+        </div>
+        <div class="header" style="display: flex">
+          <!-- TODO: Put login, reg, auth here -->
+          <div style="flex: 1" id="username"></div>
+          <div id="userAuthControls" style="flex: 0; min-width: 78px">
+            <!-- <input type="button" value="Login" id="getLogin" />
+            <input type="button" value="Register" id="getRegister" /> -->
+            <!-- TODO: Put login/ reg button here -->
+            <!-- <button onclick="location.href='{{}}'">Update Book</button>
+         <button onclick="location.href='{{deletePath}}'">Delete Book</button> -->
+          </div>
+          <!-- TODO: Sing out, not sing out -->
+        </div>
+        <div class="contentBox">
+          <div class="review">
+            <div style="display: flex; flex-direction: row">
+              <h3 style="flex: 1">Book Libary</h3>
+              <span style="flex: 0" id="addContainer"> </span>
+            </div>
+
+            <hr />
+            <div id="allBooks"></div>
+            <br />
+          </div>
+
+          <div class="synopsis">
+            <h3>Latest Discussions</h3>
+            <hr />
+            <i
+              >Yu-hue! <br />
+              Wanna start a formum and discuss a topic? Use reddit instead, this
+              is not implemeted!<br
+            /></i>
+          </div>
+        </div>
+
+        <div class="footer">
+          <h4 style="color: #333; text-align: center">
+            © 2020 - 2021 <i>My Book List </i> All Rigts Reserved
+          </h4>
+        </div>
+      </div>
+      <div class="sideR"><!-- emptey --></div>
+    </div>
+  </body>
+</html>

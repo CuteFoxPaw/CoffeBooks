@@ -1,0 +1,164 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    
+}
+
+
+
+html {
+    background-color: #ddd;
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+body{
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #ffd4d4;
+    flex: 1;
+}
+a{
+    color: #000;
+    text-decoration: none;
+}
+a:hover{
+    color: #333;
+    text-decoration: underline;
+   
+}
+.flexcontainer {
+    display: flex;
+    background-color: #ffd4d4;
+    width: 100%;
+    height: 100%;
+}
+
+.flexbox {
+    flex: 1;
+    background-color: orange;
+    width: 75%;
+    height: 75%;
+}
+.gridcontainer {
+    display: flex; 
+    margin: 0;    
+    padding: 0;
+    flex: 1;
+    min-height: 100%;
+    background-color: #ffd4d4; 
+}
+
+.sideL, .sideR{
+    flex: 5; 
+    background-color: #ffd4d4; 
+}
+.maincontent{
+    
+     display: flex;
+     flex-direction: column;
+     flex: 7; 
+     padding: 5px;
+     background-color: #fff;
+     border-width: 1px;
+     border-color: #ff8787;
+     border-style: solid;
+     min-height: 100%;
+}
+
+.nav{
+ 
+    height:0fr;
+    flex: 0;
+   
+}
+.header{   
+    flex: 0;
+    height: 0fr;
+    padding: 5px;
+    margin: 25px;
+    margin-bottom: 10px;
+    background-color: #fff;
+    border-width: 1px;
+    border-color: #ff8787;
+    border-style: solid;
+       
+}
+
+.synopsis, .review{
+ 
+    flex: 5;
+ 
+    padding: 5px;
+    margin: 10px;
+    
+    background-color: #fff;
+    border-width: 1px;
+   border-color: #ff8787;
+    border-style: solid;
+}
+
+.contentBox{
+  
+    display: flex; 
+    flex-direction: column;
+    flex: 1;
+    padding: 5px;
+    margin: 10px;
+    
+ border-color: #ff8787;
+    
+    
+}
+.title > h3{
+    color: #666;
+}
+.footer{
+    flex:0;
+   
+    padding: 5px;
+    margin: 10px;
+    margin-bottom: 0;
+    min-height: 25px;
+    
+ border-color: #ff8787;
+    border-width: 1px;
+    border-color: gray;
+    border-style: solid;
+    
+}
+hr{
+  padding: 0;
+  margin: 5px
+}
+ ul{
+        padding: 10px;
+        list-style: none;
+        display: flex;
+    }
+    .li1{
+        flex:0;
+        float: right;
+    }
+    .li2{
+        flex:1;
+        text-align: center;
+    }
+    .li3{
+        flex:0;
+        float:left;
+    }/*
+.contentBox * ,.header *{
+    line-break: anywhere;
+}*/
+@media (max-width: 900px) {
+
+.sideL, .sideR {
+  flex: 0;
+
+}
+
+}

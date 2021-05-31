@@ -1,0 +1,32 @@
+<button id="" style="height: 25px" onclick="removeElement('#bookAdderId')">
+  Go back
+</button>
+<div
+  class="addBook"
+  style="margin: auto; padding: 1em; background-color: rgb(100, 100, 100)"
+>
+  <h2>Add Book To Firebase</h2>
+
+  <form
+    id="formAddBook"
+    style="
+      display: flex;
+      justify-content: center;
+      padding: 0.5em;
+      flex-direction: column;
+    "
+  >
+    <input type="text" id="addTitle" placeholder="title" required /><br />
+    <input type="text" id="addSerie" placeholder="serie" /><br />
+    <input type="text" id="addAuthor" placeholder="author" /><br />
+    <input type="text" id="addYear" placeholder="year" /><br />
+    <!-- <input type="textarea" id="addSynopsis" placeholder="synopsis" /><br /> -->
+    <textarea
+      name="addSynopsis"
+      id="addSynopsis"
+      cols="30"
+      rows="10"
+    ></textarea>
+    <input type="submit" value="Add Book To Database" id="btnAddBook" />
+  </form>
+</div>

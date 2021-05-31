@@ -20,6 +20,7 @@ module.exports = (bookList, userList, express, app) => {
   3. Have DB of no longer active tokens that still have some time to live
   4. Query provided token against The Blacklist on every authorized request
  */
+  // ! FIX STRING INPUT char encode for js
 
   // Allows cross origin request
   app.use(cors());
@@ -27,15 +28,18 @@ module.exports = (bookList, userList, express, app) => {
   // app.use(express.urlencoded({ extended: false }));
   // app.use(express.json());
 
-//!  app.use(cookieParser());
+  app.use(cookieParser());
   /* Authoritisation
 ----- */
 
   const authToken = require('./auth.js');
-
+  app.get('/ww', (req, tes) => {
+    console.log(req);
+  });
   app.post('/register', register);
   app.post('/login', login);
   app.get('/users', authToken, async (req, res) => {
+    console.log(req.user_id);
     res.send(await userList.find().toArray());
   });
 
@@ -81,11 +85,10 @@ module.exports = (bookList, userList, express, app) => {
     });
   }
   async function login(req, res) {
-    let user = req.body;
-    user.email = user.email.toLowerCase();
     try {
       let user = req.body;
-
+      user.email = user.email.toLowerCase();
+      req.user = user;
       //let tokenFromUser = req.headers.token;
       // Searches in db for specific email
       let dbUser = await userList.findOne({ email: user.email });
@@ -98,93 +101,35 @@ module.exports = (bookList, userList, express, app) => {
           return res.status(401).send(`Loggin Error: Passwords does not match`);
 
         let token = generateToken(dbUser);
+        console.log(token);
         //req.headers.token = token;
         // maxAge: mil-seconds, 60 000 = 1 min
-        res.cookie('token', token, { maxAge: 1000 * 3600 * 24/*, httpOnly:true*/, sameSite:'lax' });
+        res.cookie('token', token, {
+          maxAge: 1000 * 3600 * 24,
+          /* httpOnly: true,*/
+          sameSite: 'lax',
+        });
 
         //TODO: Store token with cookies
-       // res.send(token); // This means you've succesfully logged in
-       res.send('succ');
+        // res.send(token); // This means you've succesfully logged in
+        res.send('succ');
       });
     } catch (err) {
       res.status(401).send(err.message);
     }
   }
-  /*
-    const username = req.body.username;
-    const user = { user: username };
-    const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
-    res.json({ accessToken: accessToken });
-  }
-  const post = [
-    { username: 'kyle', title: 'post 1' },
-    { username: 'jim', title: 'post 2' },
-  ];
-*/
-  function authingToken(req, res, next) {
-    /* const token = req.headers.token;
-    console.log(
-      `🚀 ~ file: routes.js ~ line 119 ~ authingToken ~ req.headers`,
-      req.headers
-    );
-    console.log(
-      `🚀 ~ file: routes.js ~ line 119 ~ authingToken ~ token`,
-      token
-    );
-    if (token == null || token == typeof undefined) return res.sendStatus(401);
 
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-      if (err) return res.sendStatus(403);
-      req.user = user;
-      next();
-    });*/
-    /* 
-     try {
-      let tokenFromUser = req.cookies['token'];
-
-      //if (token == null || token == typeof undefined)
-      // return res.sendStatus(401);
-
-      // let userToken = req.query.token;
-      // console.log(`🚀 ~ file: auth.js ~ line 12 ~ userToken`, userToken);
-
-      tokenFromUser = jwt.verify(
-        tokenFromUser,
-        process.env.ACCESS_TOKEN_SECRET,
-        (err, id) => {
-          if (err) {
-            return res.status(403).send(err.message);
-          }
-          console.log('Asignment');
-          req.userid = tokenFromUser.id;
-          console.log('Asignment');
-
-          next();
-        }
-      );
-      // req.userId = userToken.id;
-
-      //next();
-    } catch (err) {
-      res.status(401).send({ error: err.message });
-    }*/
-  }
-
-  /*app.get('/logins', authingToken, (req, res) => {
-    console.log('---');
-    res.json(post.filter((post) => post.username == req.user.name));
-    console.log(
-      `🚀 ~ file: routes.js ~ line 139 ~ app.get ~ req.user`,
-      req.user
-    );
-  });*/
   function generateToken(user) {
     // signs a token for our user
-//console.log(user);
     let { _id } = user;
-    let token = jwt.sign({_id}, process.env.ACCESS_TOKEN_SECRET, {
+    console.log('IDET: ' + _id);
+    console.log(user);
+    let token = jwt.sign({ _id }, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: '1d',
     });
+    console.log(token);
+    /*let test = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    console.log(test._id);*/
     return token;
   }
 
@@ -201,8 +146,6 @@ module.exports = (bookList, userList, express, app) => {
   app.get('/books', async (req, res) => {
     try {
       res.status(200).send(await bookList.find().toArray());
-
-      // // ! ERROR CODE: Topology is closed, please connect
     } catch (error) {
       res.send(error.message);
     }
@@ -235,34 +178,88 @@ module.exports = (bookList, userList, express, app) => {
     }
   });
 
-  app.post('API/book/create', (req, res) => {
+  // encode string
+  function encodeCharacters(text) {
+    var map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;',
+      '`': '&#039;',
+    };
+
+    return text.replace(/[&<>"']/g, function (m) {
+      return map[m];
+    });
+  }
+
+  app.post('/API/book/create', authToken, async (req, res) => {
+    let dbBook = await bookList.findOne({ title: req.body.title });
+    if (dbBook.title == req.body.title && dbBook.author == req.body.auhtor) {
+      res
+        .status(400)
+        .send('Book already exist! Otherwise, please contact admin support!');
+    }
     // TODO: Check for exisitng books
+    //console.log(req.user.id);
+
     let book = {
-      title: req.body.title,
-      serie: req.body.serie,
-      releaseYear: req.body.releaseYear,
-      auhtor: req.body.auhtor,
+      title: encodeCharacters(req.body.title),
+      serie: encodeCharacters(req.body.serie),
+      releaseYear: encodeCharacters(req.body.releaseYear),
+      auhtor: encodeCharacters(req.body.auhtor),
+      synopsis: encodeCharacters(req.body.synopsis),
       comments: {},
-      genre: [],
-      title: req.body.title,
-      title: req.body.title,
       scoreTotal: 0,
       scoreVotes: 0,
-      creator: req.user.id,
+      creator: req.user_id,
+      updator: {},
     };
 
     bookList.insertOne(book);
     res.status(201).send(`Book ${book.title} created`);
   });
-  app.get('/API/book/delete/:id', async (req, res) => {
+  app.post('/API/book/update', authToken, async (req, res) => {
     try {
-      //! Check if user are logged in
-      //! Delete object from client as well!
-      //! Check id != null
-      await bookList.deleteOne({ _id: ObjectId(req.params.id) });
-      res.status(202).send(`Delete of id: ${req.params.id} accepted`);
+      let dbBook = await bookList.findOne({ _id: ObjectId(req.body.id) });
+      if (!dbBook) {
+        res.status(404).send('Bookentry not found');
+      }
+      if (!dbBook.updator.find(req.user_id)) {
+        dbBook.updator.push(req.user_id);
+      }
+
+      bookList.replaceOne(
+        { _id: ObjectId(req.body.id) },
+        {
+          title: req.body.title || dbBook.title,
+          serie: req.body.serie || dbBook.serie,
+          releaseYear: req.body.releaseYear || dbBook.releaseYear,
+          author: req.body.author || dbBook.author,
+          synopsis: req.body.synopsis || dbBook.synopsis,
+          comments: dbBook.comments,
+          scoreTotal: 0,
+          scoreVotes: 0,
+          creator: dbBook.creator,
+          updator: dbBook.updator,
+        }
+      );
+      res.sendStatus(201);
     } catch (error) {
-      res.status(403).send('Error, not auhtorised or other error occured');
+      console.log(error);
+    }
+  });
+  app.delete('/API/book/delete/:id', authToken, async (req, res) => {
+    try {
+      await bookList.deleteOne({ _id: ObjectId(req.params.id) });
+      res.status(202).send(`Deletion of id: ${req.params.id} accepted`);
+    } catch (error) {
+      res
+        .status(403)
+        .send(
+          'Error, not auhtorised, wrongful Book-ID, or other error occured'
+        );
     }
   });
 
