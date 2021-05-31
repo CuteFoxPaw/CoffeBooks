@@ -7,21 +7,14 @@ const MongoClient = require('mongodb').MongoClient;
 const cookieParser = require('cookie-parser');
 
 // Allows the use of enviorment variables
-/*const env =*/ require('dotenv').config();
-//const envCookies = require('dotenv').config({ path: `.env.cookiemonster` });
-
-//This  is a comment by david!!!
-
-//
-//console.log(envCookies);
+require('dotenv').config();
 
 /* Middlewares
 ----- */
 
+// show (in console) all types of requests and statuses
 const logger = require('morgan');
 app.use(logger('dev'));
-
-//function middleWares()
 
 // Grants access to get and body variabels
 
@@ -29,7 +22,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(express.static('./static'));
 app.use(cookieParser());
-//
 
 //
 
@@ -46,8 +38,6 @@ connect();
 
 //
 
-//
-
 /* Application initiation process 
 ----- */
 
@@ -55,16 +45,7 @@ const PORT = process.env.PORT || 5500;
 
 //
 
-/* This is basicly an API, it returns pure data for our enjoyment
------ */
-
-require('./tempAPI-example.js')(app);
-
-//
-
-//
-
-/* Functions of all manners
+/* Database connection function
 ----- */
 
 async function connect() {
@@ -78,33 +59,16 @@ async function connect() {
   app.listen(PORT, console.log(`-- Server is running on PORT: ${PORT} --`));
 
   require(dir + 'routes.js')(bookList, userList, express, app);
-
-  //!  client.close();
 }
 
-//
-
-//
-
-//
-/*
-TODO: Develop everything backend, afterward develop frontend
--- Develop Server first. Afterwards connect to with client
-1) Create a connection to your DB (mongoDB)
-2) Create user-list (linked to DB)
-3) Create CRUD to mongoDB
-5) (Fileupload, book-pictures)(If too much time to spare)
-
-// Mongo DB account - G-mail Direct Auth
-
-*/
-//
-
-//
-
-/* Information bubbles
+/* Random particels of air and comments
 ----- */
+
 /*
+
+  TODO: Get gud
+
+
 ? status codes:
 500 - server problem
 404 - client problem

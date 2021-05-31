@@ -1,7 +1,7 @@
 /* Middleware for token verification
 ----- */
-// Keeps users logged in
 
+// Checks if user is logged in
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 
@@ -15,13 +15,7 @@ module.exports = (req, res, next) => {
       return res.sendStatus(401);
     }
 
-    tokenFromUser = jwt.verify(
-      tokenFromUser,
-      process.env.ACCESS_TOKEN_SECRET
-      /*(err, tok) => {
-          if (err) return res.status(403).send(err.message);
-        }*/
-    );
+    tokenFromUser = jwt.verify(tokenFromUser, process.env.ACCESS_TOKEN_SECRET);
 
     console.log(tokenFromUser._id);
     req.user_id = tokenFromUser._id;

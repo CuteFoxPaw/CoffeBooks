@@ -5,6 +5,7 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const auth = require('./auth.js');
 const dir = __dirname + '/';
 
 console.log = require('./no-indent-logger')(console.log);
@@ -20,99 +21,103 @@ module.exports = (bookList, userList, express, app) => {
   3. Have DB of no longer active tokens that still have some time to live
   4. Query provided token against The Blacklist on every authorized request
  */
-  // ! FIX STRING INPUT char encode for js
 
   // Allows cross origin request
   app.use(cors());
-  //fix req?
-  // app.use(express.urlencoded({ extended: false }));
-  // app.use(express.json());
 
-  app.use(cookieParser());
   /* Authoritisation
 ----- */
 
+  // logged in verifier
   const authToken = require('./auth.js');
-  app.get('/ww', (req, tes) => {
-    console.log(req);
+
+  // checks if user is logged in
+  app.get('/isLoggedIn', authToken, (req, res) => {
+    res.send(true);
   });
+
+  // returns user (if logged in)
+  app.get('/getUser', authToken, async (req, res) => {
+    let user = await userList.findOne({ _id: ObjectId(req.user_id) });
+    user.password = "Ain't ya bastards gettin' no nothing"; // Ain't gonna share passwords
+    res.send(user);
+  });
+
   app.post('/register', register);
   app.post('/login', login);
   app.get('/users', authToken, async (req, res) => {
     console.log(req.user_id);
-    res.send(await userList.find().toArray());
+    return res.send(await userList.find().toArray());
   });
 
   async function register(req, res) {
-    let user = {
-      email: toLowerCase(req.body.email),
-      nickname: req.body.nickname,
-      password: req.body.password,
-    };
+    try {
+      console.log(req.body);
 
-    // Check inputs & user callbacks
-    //TODO Check for correct inputed email
-    if (user.email == null)
-      return res.send(`Incorrect form, email was null or emptey`);
-    if (user.password == null)
-      return res.send(`Incorrect form, a password was null or emptey`);
-    if (await userList.findOne({ email: user.email }))
-      return res.send(`email is already in use`);
+      // Check inputs & user callbacks
+      if (req.body.email == null || req.body.email == '')
+        return res.status(400).send(`Incorrect form, email was null or emptey`);
+      if (req.body.nickname == null || req.body.nickname == '')
+        return res.status(400).send(`Incorrect form, nickname was null or emptey`);
+      if (req.body.password == null || req.body.password == '')
+        return res.status(400).send(`Incorrect form, a password was null or emptey`);
+      if (await userList.findOne({ email: req.body.email })) return res.status(400).send(`email is already in use`);
 
-    //    let dbUser = await users.findOne({ email: user.email });
+      // formats fields
+      let user = {
+        email: req.body.email.toLowerCase(),
+        nickname: req.body.nickname,
+        password: req.body.password,
+      };
 
-    //if(findOne(email)) return exitcode
-    //TODO: make sure to check that name and user are set aproprietly incl. as well that the should not already exist
+      // hashes password
+      await bcrypt.hash(user.password, 12, async (err, hash) => {
+        user.password = hash;
 
-    await bcrypt.hash(user.password, 12, async (err, hash) => {
-      user.password = hash;
+        if (err)
+          return res.send(
+            `Error, something went wrong, please make sure you've filled out all fields.
+          Error message: ${err.message}`
+          );
 
-      if (err)
-        return res.send(
-          `Error, something went wrong, please make sure you've filled out all fields.
-        Error message: ${err.message}`
-        );
-
-      try {
         await userList.insertOne(user);
-        //?await userList.deleteMany({}); // Deletes ALL documents in collection
-        res
-          .status(201)
-          .send(`Users ${user.nickname} has succsessfully registerd`);
-      } catch (err) {
-        console.log(err.message);
-      }
-    });
+        return res.status(201).send(`Users ${user.nickname} has succsessfully registerd`);
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
   async function login(req, res) {
     try {
       let user = req.body;
       user.email = user.email.toLowerCase();
-      req.user = user;
-      //let tokenFromUser = req.headers.token;
-      // Searches in db for specific email
       let dbUser = await userList.findOne({ email: user.email });
-
-      if (!dbUser) return res.send(`Email '${user.email}' was not found.`);
+      console.log(!dbUser);
+      if (!dbUser) {
+        return res.status(400).send(`Email '${user.email}' was not found.`);
+      }
 
       bcrypt.compare(user.password, dbUser.password, (err, result) => {
-        if (err) return res.status(401).send(`Compare Error`);
-        if (!result)
+        if (err) {
+          return res.status(401).send(`Compare Error`);
+        }
+        if (!result) {
           return res.status(401).send(`Loggin Error: Passwords does not match`);
+        }
 
         let token = generateToken(dbUser);
-        console.log(token);
-        //req.headers.token = token;
-        // maxAge: mil-seconds, 60 000 = 1 min
+
         res.cookie('token', token, {
           maxAge: 1000 * 3600 * 24,
-          /* httpOnly: true,*/
-          sameSite: 'lax',
+          httpOnly: true,
+          sameSite: 'Lax',
         });
 
         //TODO: Store token with cookies
-        // res.send(token); // This means you've succesfully logged in
-        res.send('succ');
+        // 200 = ok
+        if (token) {
+          res.sendStatus(200);
+        }
       });
     } catch (err) {
       res.status(401).send(err.message);
@@ -122,18 +127,16 @@ module.exports = (bookList, userList, express, app) => {
   function generateToken(user) {
     // signs a token for our user
     let { _id } = user;
-    console.log('IDET: ' + _id);
+
     console.log(user);
     let token = jwt.sign({ _id }, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: '1d',
     });
-    console.log(token);
-    /*let test = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    console.log(test._id);*/
+
     return token;
   }
 
-  /* Routes
+  /* API and Other Routes
 ----- */
 
   // returns homepage
@@ -141,7 +144,6 @@ module.exports = (bookList, userList, express, app) => {
     res.sendFile(dir + 'html.html');
   });
 
-  //TODO Change API routes to api prefixes ie. '/api/books' 'api/books/:id'
   // retuns all avalible books
   app.get('/books', async (req, res) => {
     try {
@@ -150,35 +152,34 @@ module.exports = (bookList, userList, express, app) => {
       res.send(error.message);
     }
   });
-
+  app.get('/bookReader', (req, res) => {
+    res.send(`I am not needed for crud and parital single page thingies!`);
+  });
+  // returns specific book
   app.get('/books/:id', async (req, res) => {
     try {
-      console.log('THIS IS BOOKS');
-      console.log(req.params.id);
-
-      res
-        .status(200)
-        .send(await bookList.findOne({ _id: ObjectId(req.params.id) }));
+      res.status(200).send(await bookList.findOne({ _id: ObjectId(req.params.id) }));
     } catch (error) {
       res.status(500).send(error.message);
     }
   });
-
+  /* 
+? Not yet implimented
   app.get('/books/:tag/:arg', async (req, res) => {
     try {
       //db.stuff.find( { foo: /^bar$/i } );
       const filter = new RegExp(/^req.params.arg$/, 'i');
       const list = await bookList.find({ [req.params.tag]: filter }).toArray();
 
-      if (list.length == 0 || typeof list == 'undefined')
-        res.status(404).send(`Error 404: Tag or argument not found`);
+      if (list.length == 0 || typeof list == 'undefined') res.status(404).send(`Error 404: Tag or argument not found`);
       res.status(200).send(list);
     } catch (error) {
       res.send(error.message);
     }
   });
+*/
 
-  // encode string
+  // encode charactes in string; XSS security
   function encodeCharacters(text) {
     var map = {
       '&': '&amp;',
@@ -194,51 +195,59 @@ module.exports = (bookList, userList, express, app) => {
     });
   }
 
+  // route fir creating book
   app.post('/API/book/create', authToken, async (req, res) => {
-    let dbBook = await bookList.findOne({ title: req.body.title });
-    if (dbBook.title == req.body.title && dbBook.author == req.body.auhtor) {
-      res
-        .status(400)
-        .send('Book already exist! Otherwise, please contact admin support!');
+    try {
+      let dbBook = await bookList.findOne({ title: req.body.title });
+      if (!req.body.title || !req.body.author) {
+        res.status(400).send('Title and auhtor needed!');
+      }
+      console.log(dbBook.title == req.body.title);
+
+      if (dbBook.title == req.body.title && dbBook.author == req.body.auhtor) {
+        res.status(400).send('Book already exist! Otherwise, please contact admin support!');
+      }
+
+      let book = {
+        title: req.body.title,
+        serie: encodeCharacters(req.body.serie || 'No serie'),
+        releaseYear: encodeCharacters(req.body.releaseYear || 'unkown'),
+        author: encodeCharacters(req.body.author),
+        synopsis: encodeCharacters(req.body.synopsis || 'Not yet provided'),
+        comments: {},
+        scoreTotal: 0,
+        scoreVotes: 0,
+        creator: { [req.user_id]: Date.now() },
+        updator: {},
+      };
+
+      bookList.insertOne(book);
+      return res.status(201).send(`Book <i>${book.title}</i> created`);
+    } catch (error) {
+      console.log(error);
     }
-    // TODO: Check for exisitng books
-    //console.log(req.user.id);
-
-    let book = {
-      title: encodeCharacters(req.body.title),
-      serie: encodeCharacters(req.body.serie),
-      releaseYear: encodeCharacters(req.body.releaseYear),
-      auhtor: encodeCharacters(req.body.auhtor),
-      synopsis: encodeCharacters(req.body.synopsis),
-      comments: {},
-      scoreTotal: 0,
-      scoreVotes: 0,
-      creator: req.user_id,
-      updator: {},
-    };
-
-    bookList.insertOne(book);
-    res.status(201).send(`Book ${book.title} created`);
   });
+
+  // Updates book in database
   app.post('/API/book/update', authToken, async (req, res) => {
     try {
+      console.log(req.body);
       let dbBook = await bookList.findOne({ _id: ObjectId(req.body.id) });
+
       if (!dbBook) {
         res.status(404).send('Bookentry not found');
+        return;
       }
-      if (!dbBook.updator.find(req.user_id)) {
-        dbBook.updator.push(req.user_id);
-      }
-
+      console.log(await dbBook);
+      dbBook.updator = [];
+      dbBook.updator.push({ [req.user_id]: Date.now() });
       bookList.replaceOne(
         { _id: ObjectId(req.body.id) },
         {
-          title: encodeCharacters(req.body.title) || dbBook.title,
-          serie: encodeCharacters(req.body.serie) || dbBook.serie,
-          releaseYear:
-            encodeCharacters(req.body.releaseYear) || dbBook.releaseYear,
-          author: encodeCharacters(req.body.author) || dbBook.author,
-          synopsis: encodeCharacters(req.body.synopsis) || dbBook.synopsis,
+          title: encodeCharacters(req.body.title || dbBook.title),
+          serie: encodeCharacters(req.body.serie || dbBook.serie),
+          releaseYear: encodeCharacters(req.body.releaseYear || dbBook.releaseYear),
+          author: encodeCharacters(req.body.author || dbBook.author),
           comments: dbBook.comments,
           scoreTotal: 0,
           scoreVotes: 0,
@@ -246,21 +255,20 @@ module.exports = (bookList, userList, express, app) => {
           updator: dbBook.updator,
         }
       );
-      res.sendStatus(201);
+
+      return res.sendStatus(201);
     } catch (error) {
       console.log(error);
     }
   });
+
+  // Deletes book from database, based on param id
   app.delete('/API/book/delete/:id', authToken, async (req, res) => {
     try {
       await bookList.deleteOne({ _id: ObjectId(req.params.id) });
       res.status(202).send(`Deletion of id: ${req.params.id} accepted`);
     } catch (error) {
-      res
-        .status(403)
-        .send(
-          'Error, not auhtorised, wrongful Book-ID, or other error occured'
-        );
+      res.status(403).send('Error, not auhtorised, wrongful Book-ID, or other error occured');
     }
   });
 
@@ -268,6 +276,7 @@ module.exports = (bookList, userList, express, app) => {
     res.status(404).send(`Page Not Found`);
   });
 };
+
 /* Font links
 ----- */
 

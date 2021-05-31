@@ -4,22 +4,24 @@
 async function addBookToDataBase(event) {
   try {
     event.preventDefault();
-    // Booktitle is requried
-    if (this.addTitle.value != null) {
-      let book = {
-        title: this.addTitle.value,
-        serie: this.addSerie.value,
-        searchSerieQuery: this.addSerie.value.toLowerCase(),
-        author: this.addAuthor.value,
-        year: this.addYear.value,
-        synopsis: this.addSynopsis.value,
-        timestamp: Date.now(),
-        uid: firebase.auth().currentUser.uid,
-        editors: {},
-      };
-      // with uid - relation, to know who the book belongs to
-      await bookCol.add(book);
+
+    let book = {
+      title: this.addTitle.value,
+      serie: this.addSerie.value,
+      releaseYear: this.addYear.value,
+      author: this.addAuthor.value,
+      synopsis: this.addSynopsis.value,
+    };
+
+    let res = await postFetch(book, '/API/book/create');
+    if (res.status != 201 || res.status != 202) {
+      alert(res.text());
+    } else {
       removeElement('#bookAdderId');
+      if (window.location.pathname == '/') {
+        book.id = 'N/a';
+        renderClientBook(book);
+      }
     }
   } catch (error) {
     console.log(error);
@@ -27,43 +29,6 @@ async function addBookToDataBase(event) {
 }
 
 async function updateBooks(event) {
-  /*var db = firebase.firestore(); // grants access firestore-database
-  var bookCol = db.collection('books');
-
-  //eventet är händelsen = submit
-  console.log('firebase.auth().currentUser;', firebase.auth().currentUser.uid);
-  console.log('this', this);
-
-  try {
-    event.preventDefault();
-
-    // gets editors, 
-    let editorDoc = await firebase
-      .firestore()
-      .collection('books')
-      .doc(this.updId.value)
-      .get();
-
-    arrEditors = [];
-    arrEditors = editorDoc.data().editors;
-
-    arrEditors[firebase.auth().currentUser.uid] = Date.now();
-
-    var updateObj = {};
-    if (this.updTitle.value) updateObj['title'] = this.updTitle.value;
-    if (this.updSerie.value) updateObj['serie'] = this.updSerie.value;
-    if (this.updSerie.value)
-      updateObj['searchSerieQuery'] = this.updSerie.value.toLowerCase();
-    if (this.updAuthor.value) updateObj['author'] = this.updAuthor.value;
-    if (this.updYear.value) updateObj['year'] = this.updYear.value;
-    if (this.updSynopsis.value) updateObj['synopsis'] = this.updSynopsis.value;
-    updateObj['editors'] = arrEditors;
-
-    await bookCol.doc(this.updId.value).update(updateObj);
-    removeElement('#bookUpdateId');
-  } catch (error) {
-    console.log(error.message);
-  }*/
   try {
     event.preventDefault();
 
@@ -73,28 +38,58 @@ async function updateBooks(event) {
       releaseYear: this.updYear.value,
       author: this.updAuthor.value,
       synopsis: this.updSynopsis.value,
+      id: this.updId.value,
     };
 
-    postFetch(book, '/API/book/update');
+    let res = await postFetch(book, '/API/book/update');
+
+    if ((await res.status) != 201) {
+      alert(await res.text());
+    } else {
+      removeElement('#bookUpdateId');
+      if (window.location.pathname == '/') {
+        replaceClientBook(book);
+      }
+    }
   } catch (error) {
     console.log(error);
   }
 }
 
 async function postFetch(data, url) {
-  let response = await fetch(url, {
-    headers: { 'Content-Type': 'application/json' },
-    method: 'post',
-    body: data,
-  });
-
-  console.log(response);
+  try {
+    let body = JSON.stringify(data);
+    let response = await fetch(url, {
+      headers: { 'Content-Type': 'application/json' },
+      method: 'post',
+      body: body,
+    });
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
-async function deleteDocs(docs) {
+async function deleteDocs(id) {
   try {
-    await db.collection('books').doc(docs).delete();
+    let data = {
+      id: id,
+    };
+    let body = JSON.stringify(data);
+    let res = await fetch(url, {
+      headers: { 'Content-Type': 'application/json' },
+      method: 'delete',
+      body: body,
+    });
+
+    if (res.status != 201 || res.status != 202) {
+      alert(res.text());
+    } else {
+      if (window.location.pathname == '/') {
+        updateClientBook('');
+      }
+    }
   } catch (error) {
-    console.log(error.message);
+    console.log(error);
   }
 }
