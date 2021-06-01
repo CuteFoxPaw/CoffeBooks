@@ -1,0 +1,6 @@
+Move with cmd:
+dir // shows current dir-files
+cd mapname // moves into a map cd - change directory
+cd .. // moves upwards om dir
+cd aCopiedFilePath // moves to filePath location
+d: // can be c:, d:, e: etc, moves betweem disks
