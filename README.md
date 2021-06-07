@@ -7,7 +7,7 @@ This is also similar to the [PHP-Booklist](https://github.com/VulpesPaw/PHP-Book
 ## Note
 .env-file is not included as it contains config access to mongoDb Database\
 The .env-file should be placed topmost in project, same layer as main.js and routes.js\
-.env contains following:\
+.env contains following:
 ``` .env
 PORT = 5500
 URI = "MongoDb_Access_Config_Key_Incluing_Password"
