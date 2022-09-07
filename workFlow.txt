@@ -1,3 +1,0 @@
-Next lession:
-
-• Work on jwt and auth
